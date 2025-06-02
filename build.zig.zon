@@ -9,6 +9,9 @@
         .ghmath = .{
             .path = "../ghmath/",
         },
+        .ghdbg = .{
+            .path = "../ghdbg/",
+        },
     },
 
     .paths = .{
