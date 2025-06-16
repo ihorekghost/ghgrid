@@ -109,7 +109,7 @@ pub fn Grid(
         }
 
         /// Copy all elements from one grid to another. Sizes of the grids must be equal.
-        pub fn copyElems(dest: *const @This(), src: *const @This()) *const @This() {
+        pub fn copy(dest: *const @This(), src: *const @This()) *const @This() {
             ghdbg.assertEql(u32, dest.size[0], src.size[0]);
             ghdbg.assertEql(u32, dest.size[1], src.size[1]);
 
@@ -122,7 +122,7 @@ pub fn Grid(
         }
 
         /// Create a copy of a grid. The copy preserves original's size and **stride** (size of one row + padding, in elements). It means that amount of elements allocated equals to `grid.stride * grid.size[1]`
-        pub fn dupeWithStride(grid: *const @This(), allocator: Allocator) Allocator.Error!@This() {
+        pub fn dupePreserveStride(grid: *const @This(), allocator: Allocator) Allocator.Error!@This() {
             const new_grid: @This() = @This(){
                 .elements = try allocator.alloc(T, grid.elements.len),
                 .size = grid.size,
@@ -139,7 +139,7 @@ pub fn Grid(
         pub fn dupeCompact(grid: *const @This(), allocator: Allocator) Allocator.Error!@This() {
             const new_grid: @This() = try alloc(allocator, grid.size);
 
-            copyElems(&new_grid, grid); // Copies row by row, considering padding between rows.
+            copy(&new_grid, grid); // Copies row by row, considering padding between rows.
 
             return new_grid;
         }
@@ -351,6 +351,31 @@ pub fn Grid(
 
             return grid;
         }
+
+        // pub fn drawEllipse(grid: *const @This(), pos: Vec2(i32), size: Vec2(u32), thickness: u32, element: T) *const @This() {}
+        pub fn fillEllipse(grid: *const @This(), pos: Vec2(i32), size: Vec2(i32), element: T) *const @This() {
+            if (size[0] == 0 or size[1] == 0) return grid;
+
+            const center_f32 = @as(ghmath.Vec2f32, @intFromFloat(pos)) + (@as(ghmath.Vec2f32, @floatFromInt(size)) * ghmath.Vec2f32{ 0.5, 0.5 });
+
+            const start_i32: Vec2(i32) = @min(pos, pos + size);
+            const end_i32: Vec2(i32) = @max(pos, pos + size);
+
+            const start_u32: Vec2(u32) = @intCast(math.clamp(start_i32 + Vec2(i32){ @intFromBool(size[0] < 0), @intFromBool(size[1] < 0) }, Vec2(i32){ 0, 0 }, @as(Vec2(i32), @intCast(grid.size))));
+            const end_u32: Vec2(u32) = @intCast(math.clamp(end_i32 + Vec2(i32){ @intFromBool(size[0] < 0), @intFromBool(size[1] < 0) }, Vec2(i32){ 0, 0 }, @as(Vec2(i32), @intCast(grid.size))));
+
+            for (start_u32[1]..end_u32[1]) |y| {
+                for (start_u32[0]..end_u32[0]) |x| {
+                    if (ghmath.distance(ghmath.Vec2f32{ @floatFromInt(x), @floatFromInt(y) }, center_f32) <= 3)
+                        grid.drawUnsafe(ghmath.Vec2i32{ @intCast(x), @intCast(y) }, element);
+                }
+            }
+
+            return grid;
+        }
+
+        // pub fn drawCircle(grid: *const @This(), pos: Vec2(i32), radius: f32, thickness: u32, element: T) *const @This() {}
+        // pub fn fillCircle(grid: *const @This(), pos: Vec2(i32), radius: f32, element: T) *const @This() {}
 
         pub fn borderEx(grid: *const @This(), upper_left_thickness: Vec2(u32), bottom_right_thickness: Vec2(u32), element: T) *const @This() {
             _ = grid.fillRect(.{ 0, 0 }, Vec2(i32){ @intCast(grid.size[0]), @intCast(upper_left_thickness[1]) }, element);
