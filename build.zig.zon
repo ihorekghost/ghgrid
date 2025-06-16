@@ -17,6 +17,7 @@
     },
 
     .paths = .{
+        ".gitignore",
         "build.zig",
         "build.zig.zon",
         "src",
