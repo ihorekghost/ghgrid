@@ -6,11 +6,13 @@
     .version = "0.0.0",
 
     .dependencies = .{
-        .ghmath = .{
-            .path = "../ghmath/",
-        },
         .ghdbg = .{
-            .path = "../ghdbg/",
+            .url = "git+https://github.com/ihorekghost/ghdbg.git#1bede4eb0096b55d1159ee52321e8edc05cfe299",
+            .hash = "ghdbg-0.0.0-l4p0_7UVAACi7hcPsHo7jG7hRApUqemJ9UrqEAdkaxyu",
+        },
+        .ghmath = .{
+            .url = "git+https://github.com/ihorekghost/ghmath.git#f72b3e5671bd6bdb87c0189c892815de138b3549",
+            .hash = "ghmath-0.0.1-spfjIF0sAAAahuGWrlCiWSMMtna3qvN3P2MZhv7tIRmP",
         },
     },
 

@@ -24,6 +24,10 @@ pub fn Grid(
         /// **In elements.**
         stride: u32, // 4 bytes
 
+        pub fn strideBytes(grid: *const @This()) u32 {
+            return grid.stride * @sizeOf(T);
+        }
+
         /// Returns an *empty grid* with `size` and `stride` set to `.{0, 0}`.
         pub fn empty() @This() {
             return @This(){ .elements = &.{}, .size = .{ 0, 0 }, .stride = 0 };
